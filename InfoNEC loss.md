@@ -1,5 +1,7 @@
 ### 推荐系统中InfoNCE Loss的全面解析
 
+优秀解读：https://zhuanlan.zhihu.com/p/506544456
+
 #### 一、InfoNCE Loss的含义与背景
 
 InfoNCE Loss（Info Noise-Contrastive Estimation Loss）是一种基于对比学习的损失函数，最早由Michael Gutmann和Aapo Hyvärinen在2010年提出，用于估计未归一化的概率分布。在对比学习中，它被用来**最大化正样本对之间的相似性，同时最小化与负样本的相似性**，从而学习数据的深层语义信息。其核心思想是通过对比正样本和一组负样本，训练模型区分“相关”和“不相关”的数据对。
