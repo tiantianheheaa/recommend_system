@@ -552,3 +552,186 @@ print("手动计算结果:", loss_manual.item())  # 输出: 0.3835
 5. **优化**：直接使用 `F.cross_entropy`，避免手动实现数值不稳定问题。
 
 通过这一流程，多分类交叉熵损失能够高效地引导模型学习正确的类别分布。
+
+
+---
+**二分类交叉熵**
+
+二分类交叉熵损失（**Binary Cross-Entropy Loss, BCE Loss**）是深度学习中用于二分类任务的核心损失函数，用于衡量模型预测的概率分布与真实标签的差异。它通过计算每个样本的预测概率与真实标签的负对数似然，并求平均得到最终损失。以下是其详细计算过程，包括数学推导、数值示例和关键点分析。
+
+---
+
+## **1. 输入与输出定义**
+### **(1) 模型输出（Logits 或 Probabilities）**
+- **Logits（未归一化输出）**：  
+  - 形状：`(N,)`  
+  - 每个元素是模型对样本属于正类（类别1）的原始输出（未经过 Sigmoid 激活）。  
+  - 示例：  
+    ```python
+    logits = torch.tensor([2.0, -1.0, 0.5])  # 3个样本的原始输出
+    ```
+
+- **Probabilities（归一化输出）**：  
+  - 形状：`(N,)`  
+  - 每个元素是模型对样本属于正类的概率，通过 Sigmoid 函数将 logits 转换为 `[0, 1]` 区间：  
+    \[
+    p_i = \sigma(x_i) = \frac{1}{1 + e^{-x_i}}
+    \]
+  - 示例：  
+    ```python
+    probs = torch.sigmoid(logits)  # 输出: tensor([0.8808, 0.2689, 0.6225])
+    ```
+
+### **(2) 真实标签（Target）**
+- 形状：`(N,)`  
+  - 每个元素是 `0` 或 `1`，表示样本的真实类别。  
+- 示例：  
+  ```python
+  labels = torch.tensor([1, 0, 1])  # 样本0和2是正类，样本1是负类
+  ```
+
+---
+
+## **2. 计算步骤**
+### **(1) 计算每个样本的预测概率**
+- 如果输入是 **logits**，需先通过 Sigmoid 转换为概率：  
+  ```python
+  probs = torch.sigmoid(logits)  # 输出: tensor([0.8808, 0.2689, 0.6225])
+  ```
+- 如果输入已经是 **probabilities**，则直接使用。
+
+### **(2) 计算单个样本的交叉熵损失**
+对每个样本，根据其真实标签计算损失：  
+\[
+\text{loss}_i = -\left[ y_i \cdot \log(p_i) + (1 - y_i) \cdot \log(1 - p_i) \right]
+\]
+其中：
+- \( y_i \)：真实标签（0 或 1）。  
+- \( p_i \)：模型预测的正类概率。  
+
+**示例计算**：  
+- 样本0：  
+  - \( y_0 = 1 \), \( p_0 = 0.8808 \)  
+  - \(\text{loss}_0 = -\left[ 1 \cdot \log(0.8808) + 0 \cdot \log(0.1192) \right] = -\log(0.8808) \approx 0.127\)  
+- 样本1：  
+  - \( y_1 = 0 \), \( p_1 = 0.2689 \)  
+  - \(\text{loss}_1 = -\left[ 0 \cdot \log(0.2689) + 1 \cdot \log(0.7311) \right] = -\log(0.7311) \approx 0.313\)  
+- 样本2：  
+  - \( y_2 = 1 \), \( p_2 = 0.6225 \)  
+  - \(\text{loss}_2 = -\left[ 1 \cdot \log(0.6225) + 0 \cdot \log(0.3775) \right] = -\log(0.6225) \approx 0.474\)  
+
+### **(3) 对所有样本的损失求平均**
+\[
+\text{loss} = \frac{1}{N} \sum_{i=1}^N \text{loss}_i
+\]
+**示例结果**：  
+\[
+\text{loss} = \frac{1}{3} (0.127 + 0.313 + 0.474) \approx 0.305
+\]
+
+---
+
+## **3. 完整代码示例**
+### **(1) 使用 PyTorch 内置函数 `F.binary_cross_entropy`**
+```python
+import torch
+import torch.nn.functional as F
+
+# 输入数据
+logits = torch.tensor([2.0, -1.0, 0.5])  # 原始输出
+labels = torch.tensor([1, 0, 1])         # 真实标签
+
+# 方法1：直接使用 logits 计算（内部自动应用 Sigmoid）
+loss = F.binary_cross_entropy_with_logits(logits, labels.float())
+print("F.binary_cross_entropy_with_logits 结果:", loss.item())  # 输出: 0.3047
+
+# 方法2：手动计算（验证）
+probs = torch.sigmoid(logits)
+loss_manual = F.binary_cross_entropy(probs, labels.float())
+print("F.binary_cross_entropy 结果:", loss_manual.item())  # 输出: 0.3047
+```
+
+### **(2) 手动实现（验证）**
+```python
+# 手动计算每个样本的损失
+probs = torch.sigmoid(logits)
+loss_samples = - (labels * torch.log(probs) + (1 - labels) * torch.log(1 - probs))
+loss_manual_sum = loss_samples.sum() / len(labels)
+print("手动计算结果:", loss_manual_sum.item())  # 输出: 0.3047
+```
+
+---
+
+## **4. 关键点分析**
+### **(1) 为什么需要 Sigmoid 函数？**
+- **作用**：将模型的原始输出（logits）映射到 `[0, 1]` 区间，表示概率。  
+- **数学形式**：  
+  \[
+  \sigma(x) = \frac{1}{1 + e^{-x}}
+  \]
+- **梯度性质**：Sigmoid 的导数在 `x=0` 附近最大，便于梯度传播。
+
+### **(2) 数值稳定性优化**
+直接计算 `log(p)` 或 `log(1-p)` 可能因 `p` 接近 0 或 1 导致数值溢出。PyTorch 的实现通过以下方式优化：
+- **Log-Sum-Exp 技巧**：在 `binary_cross_entropy_with_logits` 中，先对 logits 应用 `log_sigmoid` 或 `log1p_exp`，避免显式计算 Sigmoid。  
+- **示例**：  
+  ```python
+  # PyTorch 内部实现（简化版）
+  def stable_sigmoid(x):
+      return torch.clamp(torch.sigmoid(x), 1e-7, 1 - 1e-7)  # 防止 log(0) 或 log(1)
+  ```
+
+### **(3) 与多分类交叉熵的关系**
+- **多分类交叉熵**：使用 Softmax 处理多类别输出（每个样本属于且仅属于一个类别）。  
+- **二分类交叉熵**：是 Softmax 的特例（当类别数为 2 时，Softmax 退化为 Sigmoid）：  
+  \[
+  \text{Softmax}(x)_1 = \frac{e^{x_1}}{e^{x_0} + e^{x_1}} = \sigma(x_1 - x_0)
+  \]
+  若将二分类的 logits 定义为 `x_1 - x_0`，则两者等价。
+
+### **(4) 标签平滑（Label Smoothing）**
+为防止模型对标签过度自信，可对标签进行平滑：  
+\[
+y_{\text{smooth}} = \alpha \cdot y + (1 - \alpha) \cdot (1 - y)
+\]
+其中 `α ∈ (0, 1)` 是平滑系数。  
+- **PyTorch 实现**：  
+  ```python
+  alpha = 0.1
+  labels_smooth = alpha * labels + (1 - alpha) * (1 - labels)
+  loss = F.binary_cross_entropy(probs, labels_smooth)
+  ```
+
+---
+
+## **5. 常见问题**
+### **(1) 输入是概率还是 logits？**
+- **`F.binary_cross_entropy`**：输入需是概率（`[0, 1]` 区间）。  
+- **`F.binary_cross_entropy_with_logits`**：输入可以是 logits（内部自动应用 Sigmoid），推荐使用此函数以避免数值不稳定。
+
+### **(2) 如何处理类别不平衡？**
+- **加权 BCE Loss**：通过 `pos_weight` 参数为正类分配更高权重：  
+  ```python
+  pos_weight = torch.tensor([3.0])  # 正类样本的权重是负类的3倍
+  loss = F.binary_cross_entropy_with_logits(logits, labels.float(), pos_weight=pos_weight)
+  ```
+
+### **(3) 与 Focal Loss 的区别****
+- **Focal Loss**：通过调制因子 `(1 - p_t)^\gamma` 降低易分类样本的权重，解决类别不平衡问题：  
+  \[
+  \text{Focal Loss} = -\alpha_t (1 - p_t)^\gamma \log(p_t)
+  \]
+  其中 \( p_t \) 是模型对真实类别的预测概率。  
+- **PyTorch 实现**：需手动实现或使用第三方库（如 `torchvision.ops.focal_loss`）。
+
+---
+
+## **6. 总结**
+1. **输入**：模型输出 `logits` 或 `probabilities`，以及真实标签 `labels`（0 或 1）。  
+2. **Sigmoid 归一化**：将 logits 转换为概率（若输入是 logits）。  
+3. **单个样本损失**：根据真实标签计算 `-y \log(p) - (1-y) \log(1-p)`。  
+4. **平均损失**：对所有样本的损失求平均。  
+5. **优化**：推荐使用 `F.binary_cross_entropy_with_logits`，避免手动实现数值不稳定问题。  
+
+通过这一流程，二分类交叉熵损失能够高效地引导模型学习正确的类别概率分布，尤其适用于医学诊断、垃圾邮件检测等二分类任务。
+
