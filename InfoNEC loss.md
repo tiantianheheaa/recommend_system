@@ -1,6 +1,8 @@
 ### 推荐系统中InfoNCE Loss的全面解析
 
 优秀解读：https://zhuanlan.zhihu.com/p/506544456
+- NCE loss是二分类loss，loss= 正样本loss + 负样本loss。 对应二分类交叉熵损失。
+- infoNCE loss是多分类loss，loss = 正样本loss / (正样本loss+负样本loss)。 对应多分类交叉熵损失。
 
 #### 一、InfoNCE Loss的含义与背景
 
