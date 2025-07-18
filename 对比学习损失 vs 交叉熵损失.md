@@ -1,3 +1,6 @@
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 ### 对比学习常用损失函数详解及适用场景分析
 
 #### 一、对比学习核心损失函数
