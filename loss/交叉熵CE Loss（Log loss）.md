@@ -65,16 +65,18 @@ print(f"Log Loss: {loss.numpy().mean():.4f}")  # 输出示例：Log Loss: 0.2231
 ### **6. 改进方向**
 - **加权Log Loss**：  
   对正负样本赋予不同权重，解决类别不平衡问题。例如，在推荐系统中，点击样本较少，可提高正样本权重：  
-  \[
-  \text{Weighted Log Loss} = -\frac{1}{N} \sum_{i=1}^N \left[ \alpha y_i \log(p_i) + (1 - y_i) \log(1 - p_i) \right]
-  \]  
+  <img width="1604" height="1310" alt="image" src="https://github.com/user-attachments/assets/4c83241f-3b32-4310-bb4c-b43593e966f2" />
+  <img width="1658" height="1536" alt="image" src="https://github.com/user-attachments/assets/b3b43f34-3afa-43a1-9d7f-b4076a0774c6" />
+
+ 
   其中 \( \alpha \) 为正样本权重。
 
 - **Focal Loss**：  
   通过引入调制因子 \( (1 - p_t)^\gamma \) 降低易分类样本的权重，聚焦难分类样本：  
-  \[
-  \text{Focal Loss} = -\frac{1}{N} \sum_{i=1}^N \left[ y_i (1 - p_i)^\gamma \log(p_i) + (1 - y_i) p_i^\gamma \log(1 - p_i) \right]
-  \]  
+  <img width="1626" height="1506" alt="image" src="https://github.com/user-attachments/assets/6b0a589c-298e-4e0b-beda-c9610f3c749b" />
+  <img width="1666" height="1506" alt="image" src="https://github.com/user-attachments/assets/348b827c-a74e-4d23-88bf-b3af1a1daae0" />
+
+ 
   适用于正负样本分布极不均衡的场景（如稀疏点击数据）。
 
 - **结合其他指标**：  
