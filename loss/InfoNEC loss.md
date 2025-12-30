@@ -5,6 +5,7 @@
 - infoNCE loss是多分类loss，loss = 正样本loss / (正样本loss+负样本loss)。 对应多分类交叉熵损失。
 
 #### 一、InfoNCE Loss的含义与背景
+它是对比学习（Contrastive Learning）中的核心损失函数，广泛应用于自监督学习（如 SimCLR、MoCo）和表征学习。
 
 InfoNCE Loss（Info Noise-Contrastive Estimation Loss）是一种基于对比学习的损失函数，最早由Michael Gutmann和Aapo Hyvärinen在2010年提出，用于估计未归一化的概率分布。在对比学习中，它被用来**最大化正样本对之间的相似性，同时最小化与负样本的相似性**，从而学习数据的深层语义信息。其核心思想是通过对比正样本和一组负样本，训练模型区分“相关”和“不相关”的数据对。
 
@@ -16,16 +17,8 @@ InfoNCE Loss（Info Noise-Contrastive Estimation Loss）是一种基于对比学
 
 InfoNCE Loss的公式如下：
 
-\[
-\mathcal{L}_{\text{InfoNCE}} = -\frac{1}{N} \sum_{i=1}^N \log \frac{\exp(s(x_i, y_i^+) / \tau)}{\sum_{j=1}^K \exp(s(x_i, y_j^-) / \tau)}
-\]
+<img width="1560" height="864" alt="image" src="https://github.com/user-attachments/assets/6818e3ee-13f1-4162-983f-bcdcf5755bdf" />
 
-其中：
-- \(N\) 是样本数量；
-- \(s(x, y)\) 是样本 \(x\) 和 \(y\) 之间的相似度（如余弦相似度）；
-- \(y_i^+\) 是正样本（与 \(x_i\) 语义相似）；
-- \(y_j^-\) 是负样本（与 \(x_i\) 不相关）；
-- \(\tau\) 是温度系数，控制相似度分布的平滑度。
 
 ##### 2. 公式解析
 
@@ -38,6 +31,8 @@ InfoNCE Loss的公式如下：
 InfoNCE Loss 可视为多分类交叉熵的变体：
 - 交叉熵的类别数固定（如ImageNet的1000类），而InfoNCE的“类别”是动态的（1个正样本 + \(K\) 个负样本）。
 - 当忽略温度系数 \(\tau\) 时，InfoNCE 等价于交叉熵。
+<img width="1690" height="968" alt="image" src="https://github.com/user-attachments/assets/e99d616f-9037-4555-833b-c97f9fef6f14" />
+
 
 #### 三、InfoNCE Loss在推荐系统中的应用
 
@@ -58,6 +53,9 @@ InfoNCE Loss 可视为多分类交叉熵的变体：
 在推荐系统中，用户和物品的描述可能包含多种模态（如文本、图像）。InfoNCE Loss可用于对齐不同模态的表示，例如：
 - 将用户查询的文本表示与物品的图像表示对齐；
 - 通过对比学习，让模型学会跨模态的语义匹配。
+
+<img width="1714" height="1482" alt="image" src="https://github.com/user-attachments/assets/b8a02b2b-10d3-464f-a306-83cd5c6b423b" />
+
 
 #### 四、代码示例与实现
 
