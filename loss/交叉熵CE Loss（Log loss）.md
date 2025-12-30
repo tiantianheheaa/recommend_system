@@ -10,16 +10,14 @@ Log Loss通过惩罚模型对真实标签的错误预测概率来量化性能，
 ### **2. 数学公式**
 - **二分类场景**：  
   对于样本 \( i \)，实际标签为 \( y_i \in \{0, 1\} \)，预测概率为 \( p_i \)，Log Loss定义为：  
-  \[
-  \text{Log Loss} = -\frac{1}{N} \sum_{i=1}^N \left[ y_i \log(p_i) + (1 - y_i) \log(1 - p_i) \right]
-  \]  
+  <img width="1700" height="1512" alt="image" src="https://github.com/user-attachments/assets/edfb1818-4f7b-4bc7-85f1-7bed5e106677" />
+
   其中 \( N \) 为样本总数。当 \( p_i \) 接近1且 \( y_i=1 \)（或 \( p_i \) 接近0且 \( y_i=0 \)）时，损失趋近于0；否则损失趋近于无穷大。
 
 - **多分类场景**：  
   对于 \( K \) 个类别，样本 \( i \) 的真实标签为 \( y_{i,k} \)（one-hot编码），预测概率为 \( p_{i,k} \)，Log Loss为：  
-  \[
-  \text{Log Loss} = -\frac{1}{N} \sum_{i=1}^N \sum_{k=1}^K y_{i,k} \log(p_{i,k})
-  \]
+  <img width="1650" height="1330" alt="image" src="https://github.com/user-attachments/assets/bdc2440f-0a93-4b50-9b2a-b96b1860de0c" />
+
 
 ### **3. 推荐系统中的应用场景**
 - **点击率预估（CTR）**：  
