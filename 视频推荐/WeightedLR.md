@@ -1,3 +1,7 @@
+## 自己总结
+- WeightedLR 是用来做视频观看时长预估。 不是用来做视频duration消偏的。
+
+--- 
 我来搜索关于加权逻辑回归（Weighted Logistic Regression）在视频推荐算法中的最新研究和应用。
 # Weighted Logistic Regression (加权逻辑回归) 详解
 
