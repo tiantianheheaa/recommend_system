@@ -1,3 +1,9 @@
+- DIN和target-attention的思想是一样的。只是具体实现有一些细微差别。
+- target-attention是用候选商品的emb 和 用户行为序列中的emb 做**内积得到scores**，然后softmax的weights。
+- DIN是用候选商品emb和用户行为序列emb，通过一个**小型MLP得到scores**。  可以通过softmax归一化、也可以不通过softmax归一化直接用原始mlp输出值。
+
+--- 
+
 # DIN 用户行为序列建模：原理、代码、适用场景与在线耗时
 
 本文按以下结构展开：
